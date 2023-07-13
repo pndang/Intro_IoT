@@ -1,2 +1,2 @@
 # Intro_IoT
-Programs for ESP32 on Arduino IDE - Internet of Things
+C and MicroPython Programs for ESP32 - Internet of Things
