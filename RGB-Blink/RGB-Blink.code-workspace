@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "serial:/COM7",
+			"uri": "serial://com7/flash"
+		},
+		{
+			"name": "serial:/COM8",
+			"uri": "serial://com8/flash"
+		},
+		{
+			"name": "PySense2",
+			"path": "../PySense2"
+		}
+	],
+	"settings": {}
+}
