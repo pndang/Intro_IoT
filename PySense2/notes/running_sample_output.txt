@@ -1,0 +1,54 @@
+b'4c001006'
+b'4c001202'
+b'06000109'
+b'4c001007'
+b'06000109'
+b'4c000215'
+PyN 2 BLE_MAC: b'da76e86cdd26', Pressure: 1002 hPa, Gas resistance: 34178 ohm, rssi: -37
+Temperature: 24.8 C, Humidity: 52.3 %r.H. 58
+IAQ score: 94.87494
+Air quality is Good
+
+MPL3115A2 temperature: 31.0
+Altitude: 81.9375
+Pressure: 100349.0
+Temperature: 32.73022 deg C
+Relative Humidity: 46.59323 %RH
+Dew point: 19.79319 deg C
+Humidity Ambient for 24.4 deg C: 75.57981 %RH
+Light (channel Blue, channel Red): (0, 0)
+Lux:  0 lx
+Acceleration: (0.1573486, -0.1102295, -1.004028)
+Roll: -171.1356
+Pitch: 6.452366
+Battery voltage: 4.581326
+Battery voltage: 4.666631 , percentage:  92.46947
+
+
+b'4c001006'
+b'4c001007'
+b'4c001005'
+b'4c001006'
+b'06000109'
+b'06000109'
+b'4c001007'
+b'4c000215'
+PyN 2 BLE_MAC: b'f1e3df05c311', Pressure: 1002 hPa, Gas resistance: 53623 ohm, rssi: -95
+Temperature: 23.51 C, Humidity: 60.8 %r.H. 65
+IAQ score: 91.33327
+Air quality is Good
+
+MPL3115A2 temperature: 31.0
+Altitude: 81.9375
+Pressure: 100352.3
+Temperature: 32.73022 deg C
+Relative Humidity: 46.61612 %RH
+Dew point: 19.82242 deg C
+Humidity Ambient for 24.4 deg C: 75.70443 %RH
+Light (channel Blue, channel Red): (0, 0)
+Lux:  0 lx
+Acceleration: (0.1580811, -0.107666, -1.00354)
+Roll: -171.0481
+Pitch: 6.026534
+Battery voltage: 4.586344
+Battery voltage: 4.671649 , percentage:  96.98561

@@ -1,10 +1,10 @@
 # main.py -- put your code here!
 
 from network import Bluetooth
+import time
 import ubinascii
 import struct
 import math
-import time
 import pycom
 from pycoproc_2 import Pycoproc
 import machine
@@ -13,6 +13,9 @@ from LIS2HH12 import LIS2HH12
 from SI7006A20 import SI7006A20
 from LTR329ALS01 import LTR329ALS01
 from MPL3115A2 import MPL3115A2,ALTITUDE,PRESSURE
+
+pycom.heartbeat(False)
+pycom.rgbled(0x0A0A08) # white
 
 bt = Bluetooth()
 bt.start_scan(-1)
@@ -73,10 +76,38 @@ def air_quality_score(hum, gas_res):
         print("Good")
 
 while True:
-    print("\nAir Sensor Internal:\n")
+    print('Air Sensor External:\n')
+    adv = bt.get_adv()
+    if adv: # and adv.rssi>-80:# and ubinascii.hexlify(adv.mac)==b'cd9e13c0f24a':
+        read_adv = bt.resolve_adv_data(adv.data, Bluetooth.ADV_MANUFACTURER_DATA)
+        if read_adv==None:
+            pass
+        else:
+            manuf = ubinascii.hexlify(read_adv)
+            manuf_data = ubinascii.hexlify(read_adv[0:4])
+            # print(manuf_data)
+            if (manuf_data == b'4c000215') :#or (manuf_data == b'd2000215')):# company id=d2 is Dialog, b'4c000215' is Apple's id and it implies ibeacon
+                # print("mac:", ubinascii.hexlify(adv.mac))
+                uuid_raw = read_adv[4:20]
+                uuid = ubinascii.hexlify(uuid_raw)
+                name, air=byte_to_info(uuid_raw)
+                if name == "PyN":
+                    print("rssi:",adv.rssi)
+                    major = ubinascii.hexlify(read_adv[20:22])
+                    minor = ubinascii.hexlify(read_adv[22:24])
+                    tx_power = ubinascii.hexlify(read_adv[24:25])
+                    tx_power_real = twoscmp(int(tx_power, 16))
+                    major_int = int(major, 16)
+                    major_f = major_int/100 # bme688
+                    minor_int = int(minor,16)
+                    minor_f = minor_int/100 # bme688, it is divided by 10 initially in the dialog's firmware.
+                    print("Temperature: {} C, Humidity: {} %r.H.".format(major_f, minor_f), time.time())
+                    air_quality_score(minor_f, air)
+                    print("")
+    else:
+        time.sleep(0.050)
 
-    pycom.heartbeat(False)
-    pycom.rgbled(0x0A0A08) # white
+    print("Internal sensors:\n")
 
     py = Pycoproc()
     if py.read_product_id() != Pycoproc.USB_PID_PYSENSE:
@@ -129,40 +160,4 @@ while True:
         print("Sent data to pybytes")
 
     time.sleep(3)
-
-    print("\nAir Sensor External 1:\n")
-    print('test1')
-    adv = bt.get_adv()
-    if adv: # and adv.rssi>-80:# and ubinascii.hexlify(adv.mac)==b'cd9e13c0f24a':
-        
-        print('test2')
-        
-        read_adv = bt.resolve_adv_data(adv.data, Bluetooth.ADV_MANUFACTURER_DATA)
-        if read_adv==None:
-            print('passed')
-            pass
-        else:
-            manuf = ubinascii.hexlify(read_adv)
-            manuf_data = ubinascii.hexlify(read_adv[0:4])
-            # print(manuf_data)
-            if (manuf_data == b'4c000215') :#or (manuf_data == b'd2000215')):# company id=d2 is Dialog, b'4c000215' is Apple's id and it implies ibeacon
-                # print("mac:", ubinascii.hexlify(adv.mac))
-                uuid_raw = read_adv[4:20]
-                uuid = ubinascii.hexlify(uuid_raw)
-                name, air=byte_to_info(uuid_raw)
-                if name == "PyN":
-                    print('test3')
-                    print("rssi:",adv.rssi)
-                    major = ubinascii.hexlify(read_adv[20:22])
-                    minor = ubinascii.hexlify(read_adv[22:24])
-                    tx_power = ubinascii.hexlify(read_adv[24:25])
-                    tx_power_real = twoscmp(int(tx_power, 16))
-                    major_int = int(major, 16)
-                    major_f = major_int/100 # bme688
-                    minor_int = int(minor,16)
-                    minor_f = minor_int/100 # bme688, it is divided by 10 initially in the dialog's firmware.
-                    print("Temperature: {} C, Humidity: {} %r.H.".format(major_f, minor_f), time.time())
-                    air_quality_score(minor_f, air)
-                    print("")
-    else:
-        time.sleep(0.050)
+    
