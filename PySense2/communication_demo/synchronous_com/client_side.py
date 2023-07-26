@@ -11,7 +11,6 @@ bt.set_advertisement(name='Client', service_uuid=SERVICE_UUID)
 def handle_data(chr):
     value = chr.value()
     print("Received:", value)
-    # Implement your logic here to process the received data
 
 def send_acknowledgment(chr):
     chr.value('ACK')  # Send acknowledgment message
