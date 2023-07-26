@@ -6,6 +6,10 @@
 		{
 			"name": "serial:/COM8",
 			"uri": "serial://com8/flash"
+		},
+		{
+			"name": "serial:/COM9",
+			"uri": "serial://com9/flash"
 		}
 	],
 	"settings": {}

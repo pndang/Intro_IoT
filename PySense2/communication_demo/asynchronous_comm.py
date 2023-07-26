@@ -48,13 +48,12 @@ while(True):
                         chars = service.characteristics()
                         for char in chars:
                             c_uuid = char.uuid()
-                            if c_uuid == 0xec0e:
+                            if char.uuid() == 0xec0e:
                                 if (char.properties() & Bluetooth.PROP_NOTIFY):
                                     char.callback(trigger=Bluetooth.CHAR_NOTIFY_EVENT, handler=char_notify_callback)
-                                    print(c_uuid)
                                     time.sleep(3)  # check for asynchronous communication
                                     break
-                except:
+                except:                 
                     continue
         except:
             continue
