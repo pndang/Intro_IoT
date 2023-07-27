@@ -33,6 +33,8 @@ while(True):
                         chars = service.characteristics()
                         for char in chars:
                             if char.uuid() == DATA_CHARACTERISTIC_UUID:
+                                print(char.properties())
+                                print(Bluetooth.PROP_NOTIFY)
                                 if (char.properties() & Bluetooth.PROP_NOTIFY):
                                     char.callback(trigger=Bluetooth.CHAR_NOTIFY_EVENT, handler=char_notify_callback)      
                 
@@ -47,7 +49,7 @@ while(True):
             data = chr1.read()
             print('read: ', chr1.read())
             print('value: ', chr1.value())
-            if data == b'90':
+            if data == b'93':
                 chr1.write('ACK: Received 90!')
                 print('sent ACK')
         except:

@@ -1,15 +1,15 @@
 import time
 from network import Bluetooth
 
-SERVICE_UUID = 0x1800
-DATA_CHARACTERISTIC_UUID = 0x2A00
+SERVICE_UUID = 0xec00
+DATA_CHARACTERISTIC_UUID = 0xec0e
 ACK_CHARACTERISTIC_UUID = 0x2A01
 
 bluetooth = Bluetooth()
 bluetooth.set_advertisement(name='Grp3', service_uuid=SERVICE_UUID)
 
-srv = bluetooth.service(uuid=SERVICE_UUID, isprimary=True)
-data_chr = srv.characteristic(uuid=DATA_CHARACTERISTIC_UUID, value='Hello, Client!', properties=Bluetooth.PROP_READ | Bluetooth.PROP_NOTIFY)
+srv = bluetooth.service(uuid=SERVICE_UUID, isprimary=True, nbr_chars=2)
+data_chr = srv.characteristic(uuid=DATA_CHARACTERISTIC_UUID, value='Hello, Client!', properties=Bluetooth.PROP_READ | Bluetooth.PROP_NOTIFY | Bluetooth.PROP_WRITE)
 ack_chr = srv.characteristic(uuid=ACK_CHARACTERISTIC_UUID, value='Waiting for ACK', properties=Bluetooth.PROP_WRITE)
 
 # Flag to indicate acknowledgment status
@@ -43,7 +43,7 @@ def handle_ack(chr, data):
     print("ACK Received:", data)
     acknowledgment_received = True  # Set flag to True, acknowledgment received
 
-ack_chr.callback(trigger=Bluetooth.CHAR_WRITE_EVENT, handler=handle_ack)
+# ack_chr.callback(trigger=Bluetooth.CHAR_WRITE_EVENT, handler=handle_ack)
 
 def conn_cb(chr):
     global client_connected
@@ -56,6 +56,8 @@ def conn_cb(chr):
         client_connected = False
 
 bluetooth.callback(trigger=Bluetooth.CLIENT_CONNECTED | Bluetooth.CLIENT_DISCONNECTED, handler=conn_cb)
+
+data_chr.callback(trigger=Bluetooth.CHAR_NOTIFY_EVENT, handler=handle_ack)
 
 print("BLE Started!")
 bluetooth.advertise(True)
@@ -79,53 +81,3 @@ while True:
 
     send_data()
     time.sleep(2)
-
-
-
-
-
-
-# *****
-
-
-# import time
-# from network import Bluetooth
-
-# SERVICE_UUID = 0xAAAA
-# DATA_CHARACTERISTIC_UUID = 0xBBBB
-# ACK_CHARACTERISTIC_UUID = 0xCCCC
-
-# bt = Bluetooth()
-# bt.set_advertisement(name='Team 3: Aidan & Phu', service_uuid=SERVICE_UUID)
-
-# srv = bt.service(uuid=SERVICE_UUID, isprimary=True)
-# data_chr = srv.characteristic(uuid=DATA_CHARACTERISTIC_UUID, value='Hello, Client!', properties=Bluetooth.PROP_NOTIFY)
-# ack_chr = srv.characteristic(uuid=ACK_CHARACTERISTIC_UUID, value='Waiting for ACK', properties=Bluetooth.PROP_READ)
-
-# # Flag to indicate acknowledgment status
-# acknowledgment_received = False
-
-# def send_data():
-#     data_chr.notify(True)
-#     data_chr.value('Hello, Client!')
-
-# def handle_ack(chr):
-#     global acknowledgment_received
-#     value = chr.value()
-#     print("ACK Received:", value)
-#     acknowledgment_received = True
-
-# ack_chr.callback(trigger=Bluetooth.CHAR_NOTIFY_EVENT, handler=handle_ack)
-
-# bt.advertise(True)
-
-# while True:
-#     # Wait until acknowledgment is received
-#     while not acknowledgment_received:
-#         pass  # Do nothing and keep waiting
-
-#     # Acknowledgment received, reset the flag and send data
-#     acknowledgment_received = False
-#     send_data()
-#     time.sleep(5)
-    
