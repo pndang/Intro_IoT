@@ -3,8 +3,8 @@
 #define LED_PIN     12
 #define NUM_LEDS    144
 #define LOW_BRIGHTNESS    5
-#define MID_BRIGHTNESS    46
-#define HIG_BRIGHTNESS    155
+#define MID_BRIGHTNESS    55
+#define HIG_BRIGHTNESS    115
 
 CRGB leds[NUM_LEDS];
 int ledPin = 2;
@@ -111,16 +111,16 @@ void graduallyOff(int currBrightness) {
 
 void graduallyOn(int currBrightness, int brightness) {
 
-  for (int i = currBrightness+1; i <= brightness; i++) {
-    FastLED.setBrightness(i);
-    for (int j = 0; j <= NUM_LEDS; j++) {
-      leds[j] = CRGB(255, 255, 255);
-    }
-    if (ledOn == false) {
+  if (ledOn == false) {
+    for (int i = currBrightness+1; i <= brightness; i++) {
+      FastLED.setBrightness(i);
+      for (int j = 0; j <= NUM_LEDS; j++) {
+        leds[j] = CRGB(255, 255, 255);
+      }
       FastLED.show();
-      ledOn = true;
+      delay(8);
     }
-    delay(8);
+    ledOn = true;
   }
 
   currBrightness = brightness;
