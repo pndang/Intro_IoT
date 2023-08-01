@@ -1,4 +1,15 @@
 #include <FastLED.h>
+#include <WiFi.h>
+#include <WiFiClientSecure.h>
+#include <HTTPClient.h>
+#include <Wire.h>
+
+// Network credentials
+const char* ssid = "Phu Dang";
+const char* password = "dangphu9220";
+
+// Database info
+const char* serverName = "https://UCSD-HDSI-IOT.com/post-esp-data.php";
 
 #define LED_PIN     12
 #define NUM_LEDS    144
@@ -7,38 +18,49 @@
 #define HIG_BRIGHTNESS    115
 
 CRGB leds[NUM_LEDS];
-int ledPin = 2;
+int onboardLEDPin = 2;
 int pirPin = 4;
 int pirVal = 0;
 bool ledOn = false;
 int currBrightness = 0;
 int delayDuration = 30000;
 unsigned long delayTime = 0;
-// bool delayRunning = false;
 
 void setup() {
-
   Serial.begin(115200);
-  FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
-  pinMode(ledPin, OUTPUT);
-  pinMode(pirPin, INPUT);
 
+  blinkOnboardLED(0);
+  blinkOnboardLED(0);
+
+  WiFi.begin(ssid, password);
+  Serial.println("Connecting");
+  while(WiFi.status() != WL_CONNECTED) { 
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.print("Connected to WiFi network with IP Address: ");
+  Serial.println(WiFi.localIP());
+
+  FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
+  pinMode(onboardLEDPin, OUTPUT);
+  pinMode(pirPin, INPUT);
 }
 
 void loop() {
 
   pirVal = digitalRead(pirPin);
+  sendData();
   
   if (pirVal == HIGH) {
 
-    blinkOnboardLED();
-
-    // delayRunning = true;
     delayTime = millis();
 
     while ((millis() - delayTime) < delayDuration) {
 
-      graduallyOn(currBrightness, MID_BRIGHTNESS);
+      graduallyOn(currBrightness, LOW_BRIGHTNESS);
+
+      sendData();
 
       Serial.println(delayTime);
       Serial.println((millis() - delayTime));
@@ -49,6 +71,8 @@ void loop() {
         delayTime = millis();
       }
 
+      delay(1500);
+
     }
 
   } 
@@ -57,14 +81,16 @@ void loop() {
     graduallyOff(currBrightness);
 
   }
+
+  delay(1500);
   
 }
 
-void blinkOnboardLED() {
+void blinkOnboardLED(int delayLength) {
 
-  digitalWrite(ledPin, HIGH);
-  delay(2000);
-  digitalWrite(ledPin, LOW);
+  digitalWrite(onboardLEDPin, HIGH);
+  delay(delayLength);
+  digitalWrite(onboardLEDPin, LOW);
 
 }
 
@@ -124,4 +150,51 @@ void graduallyOn(int currBrightness, int brightness) {
   }
 
   currBrightness = brightness;
+}
+
+void sendData() {
+
+  String apiKeyValue = "tPmAT5Ab3j7F9";
+  String sensorName = "Team 3";
+  String sensorLocation = "UC San Diego";
+
+  //Check WiFi connection status
+  if(WiFi.status()== WL_CONNECTED){
+    WiFiClientSecure *client = new WiFiClientSecure;
+    client->setInsecure(); //don't use SSL certificate
+    HTTPClient https;
+    
+    // Your Domain name with URL path or IP address with path
+    https.begin(*client, serverName);
+    
+    // Specify content-type header
+    https.addHeader("Content-Type", "application/x-www-form-urlencoded");
+    
+    // Prepare your HTTP POST request data
+    String httpRequestData = "api_key=" + apiKeyValue + "&sensor=" + sensorName
+                          + "&location=" + sensorLocation + "&value1=" + String(digitalRead(pirPin))
+                          + "&value2=" + String(digitalRead(pirPin)) + "&value3=" + String(digitalRead(pirPin)) + "";
+    Serial.print("httpRequestData: ");
+    Serial.println(httpRequestData);
+
+    // Send HTTP POST request
+    int httpResponseCode = https.POST(httpRequestData);
+    
+    if (httpResponseCode>0) {
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+      blinkOnboardLED(2000);
+    }
+    else {
+      Serial.print("Error code: ");
+      Serial.println(httpResponseCode);
+      ESP.restart();
+    }
+
+    https.end();
+  }
+  else {
+    Serial.println("WiFi Disconnected");
+  }
+
 }
