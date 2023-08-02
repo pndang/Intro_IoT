@@ -13,7 +13,7 @@ const char* password = "dangphu9220";
 const char* serverName = "https://UCSD-HDSI-IOT.com/post-esp-data.php";
 
 #define LED_PIN     12
-#define NUM_LEDS    144
+#define NUM_LEDS     31   // 144 - MAX
 #define LOW_BRIGHTNESS    5
 #define MID_BRIGHTNESS    55
 #define HIG_BRIGHTNESS    115
@@ -77,12 +77,13 @@ void loop() {
     while ((millis() - delayTime) < delayDuration) {
 
       int lightingCondition = analogRead(temt6000Pin);
-      Serial.print("read through function: ");
-      Serial.print(analogRead(temt6000Pin));
-      Serial.println("done reading");
-
+      Serial.print("lighting condition: ");
+      Serial.print(lightingCondition);
+      Serial.println("");
       if (lightingCondition > 850) {
-        graduallyOn(currBrightness, 31);
+        Serial.println("OVER 850");
+        graduallyOff(currBrightness);
+        graduallyOn(currBrightness, 99);
       // } else if (lightingCondition <= 850 && lightCondition >= 5)
       } else {
         graduallyOff(currBrightness);
@@ -93,7 +94,6 @@ void loop() {
 
       Serial.println(delayTime);
       Serial.println((millis() - delayTime));
-      Serial.println(lightingCondition);
 
       if (digitalRead(pirPin) == HIGH) {
         delayTime = millis();
