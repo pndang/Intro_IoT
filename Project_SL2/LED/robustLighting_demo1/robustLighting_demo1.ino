@@ -55,6 +55,7 @@ void setup() {
   FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
   pinMode(onboardLEDPin, OUTPUT);
   pinMode(pirPin, INPUT);
+  pinMode(temt6000Pin, INPUT);
   dht.begin();
 }
 
@@ -70,19 +71,21 @@ void loop() {
     while ((millis() - delayTime) < delayDuration) {
 
       int lightingCondition = analogRead(temt6000Pin);
+      Serial.println(lightingCondition);
+
       if (lightingCondition > 850) {
-        graduallyOn(currBrightness, 5);
+        graduallyOn(currBrightness, 31);
       // } else if (lightingCondition <= 850 && lightCondition >= 5)
       } else {
-        graduallyOn(currBrightness, 31);
+        graduallyOff(currBrightness);
+        graduallyOn(currBrightness, 5);
       }
 
       sendData();
 
       Serial.println(delayTime);
       Serial.println((millis() - delayTime));
-      Serial.print(" ");
-      Serial.print(((millis() - delayTime) < delayDuration));
+      Serial.println(lightingCondition);
 
       if (digitalRead(pirPin) == HIGH) {
         delayTime = millis();
@@ -190,7 +193,7 @@ void sendData() {
     // Prepare your HTTP POST request data
     String httpRequestData = "api_key=" + apiKeyValue + "&sensor=" + sensorName
                           + "&location=" + sensorLocation + "&value1=" + String(digitalRead(pirPin))
-                          + "&value2=" + String(dht.readHumidity()) + "&value3=" + String(dht.readTemperature(true)) + "";
+                          + "&value2=" + String(dht.readHumidity())+"%" + "&value3=" + String(dht.readTemperature(true))+"°F" + "";
     Serial.print("httpRequestData: ");
     Serial.println(httpRequestData);
 
