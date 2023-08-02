@@ -3,6 +3,7 @@
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <Wire.h>
+#include "DHT.h"
 
 // Network credentials
 const char* ssid = "Phu Dang";
@@ -16,7 +17,16 @@ const char* serverName = "https://UCSD-HDSI-IOT.com/post-esp-data.php";
 #define LOW_BRIGHTNESS    5
 #define MID_BRIGHTNESS    55
 #define HIG_BRIGHTNESS    115
+#define DHT_PIN     17
+#define DHT_TYPE     DHT11
 
+// Declare vars for DHT sensor 
+DHT dht(DHT_PIN, DHT_TYPE);
+
+// Declare vars for ambient light sensor
+int temt6000Pin = 13;
+
+// Declare vars for LED strip
 CRGB leds[NUM_LEDS];
 int onboardLEDPin = 2;
 int pirPin = 4;
@@ -45,6 +55,7 @@ void setup() {
   FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
   pinMode(onboardLEDPin, OUTPUT);
   pinMode(pirPin, INPUT);
+  dht.begin();
 }
 
 void loop() {
@@ -58,7 +69,13 @@ void loop() {
 
     while ((millis() - delayTime) < delayDuration) {
 
-      graduallyOn(currBrightness, LOW_BRIGHTNESS);
+      int lightingCondition = analogRead(temt6000Pin);
+      if (lightingCondition > 850) {
+        graduallyOn(currBrightness, 5);
+      // } else if (lightingCondition <= 850 && lightCondition >= 5)
+      } else {
+        graduallyOn(currBrightness, 31);
+      }
 
       sendData();
 
@@ -173,7 +190,7 @@ void sendData() {
     // Prepare your HTTP POST request data
     String httpRequestData = "api_key=" + apiKeyValue + "&sensor=" + sensorName
                           + "&location=" + sensorLocation + "&value1=" + String(digitalRead(pirPin))
-                          + "&value2=" + String(digitalRead(pirPin)) + "&value3=" + String(digitalRead(pirPin)) + "";
+                          + "&value2=" + String(dht.readHumidity()) + "&value3=" + String(dht.readTemperature(true)) + "";
     Serial.print("httpRequestData: ");
     Serial.println(httpRequestData);
 
