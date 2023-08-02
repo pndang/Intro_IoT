@@ -24,7 +24,8 @@ const char* serverName = "https://UCSD-HDSI-IOT.com/post-esp-data.php";
 DHT dht(DHT_PIN, DHT_TYPE);
 
 // Declare vars for ambient light sensor
-int temt6000Pin = 13;
+int temt6000Pin = 33;
+int lightingCondition = 0;
 
 // Declare vars for LED strip
 CRGB leds[NUM_LEDS];
@@ -55,8 +56,13 @@ void setup() {
   FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
   pinMode(onboardLEDPin, OUTPUT);
   pinMode(pirPin, INPUT);
-  pinMode(temt6000Pin, INPUT);
   dht.begin();
+
+
+  Serial.print("read through function setup: ");
+  Serial.print(analogRead(temt6000Pin));
+  Serial.println("done reading");
+
 }
 
 void loop() {
@@ -71,7 +77,9 @@ void loop() {
     while ((millis() - delayTime) < delayDuration) {
 
       int lightingCondition = analogRead(temt6000Pin);
-      Serial.println(lightingCondition);
+      Serial.print("read through function: ");
+      Serial.print(analogRead(temt6000Pin));
+      Serial.println("done reading");
 
       if (lightingCondition > 850) {
         graduallyOn(currBrightness, 31);
