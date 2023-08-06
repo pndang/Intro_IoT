@@ -6,8 +6,8 @@
 #include "DHT.h"
 
 // Network credentials
-const char* ssid = "Phu Dang";
-const char* password = "dangphu9220";
+const char* ssid = "";
+const char* password = "";
 
 // Database info
 const char* serverName = "https://UCSD-HDSI-IOT.com/post-esp-data.php";
@@ -77,9 +77,9 @@ void loop() {
     while ((millis() - delayTime) < delayDuration) {
 
       int lightingCondition = analogRead(temt6000Pin);
-      Serial.print("lighting condition: ");
-      Serial.print(lightingCondition);
-      Serial.println("");
+      // Serial.print("lighting condition: ");
+      // Serial.print(lightingCondition);
+      // Serial.println("");
       if (lightingCondition > 3999) {
 
         FastLED.setBrightness(LOW_BRIGHTNESS);
@@ -108,8 +108,8 @@ void loop() {
 
       sendData();
 
-      Serial.println(delayTime);
-      Serial.println((millis() - delayTime));
+      // Serial.println(delayTime);
+      // Serial.println((millis() - delayTime));
 
       if (digitalRead(pirPin) == HIGH) {
         delayTime = millis();
@@ -198,7 +198,7 @@ void graduallyOn(int currBrightness, int brightness) {
 
 void sendData() {
 
-  String apiKeyValue = "tPmAT5Ab3j7F9";
+  String apiKeyValue = "";
   String sensorName = "Team 3";
   String sensorLocation = "UC San Diego";
 
@@ -208,13 +208,13 @@ void sendData() {
     client->setInsecure(); //don't use SSL certificate
     HTTPClient https;
     
-    // Your Domain name with URL path or IP address with path
+    // Domain name with URL path
     https.begin(*client, serverName);
     
     // Specify content-type header
     https.addHeader("Content-Type", "application/x-www-form-urlencoded");
     
-    // Prepare your HTTP POST request data
+    // Prepare HTTP POST request data
     String httpRequestData = "api_key=" + apiKeyValue + "&sensor=" + sensorName
                           + "&location=" + sensorLocation + "&value1=" + String(digitalRead(pirPin))
                           + "&value2=" + String(dht.readHumidity())+"%" + "&value3=" + String(dht.readTemperature(true))+"°F" + "";
@@ -224,6 +224,7 @@ void sendData() {
     // Send HTTP POST request
     int httpResponseCode = https.POST(httpRequestData);
     
+    // Get response code
     if (httpResponseCode>0) {
       Serial.print("HTTP Response code: ");
       Serial.println(httpResponseCode);

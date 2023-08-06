@@ -17,15 +17,15 @@
 #include <Wire.h>
 
 // Replace with your network credentials
-const char* ssid = "Phu Dang";
-const char* password = "dangphu9220";
+const char* ssid = "";
+const char* password = "";
 
 // REPLACE with your Domain name and URL path or IP address with path
 const char* serverName = "https://UCSD-HDSI-IOT.com/post-esp-data.php";
 
 // Keep this API Key value to be compatible with the PHP code provided in the project page. 
 // If you change the apiKeyValue value, the PHP file /post-esp-data.php also needs to have the same key 
-String apiKeyValue = "tPmAT5Ab3j7F9";
+String apiKeyValue = "";
 
 String sensorName = "PIR_Sensor";
 String sensorLocation = "Makerspace";
@@ -70,21 +70,9 @@ void loop() {
                           + "&value2=" + String(digitalRead(irPin)) + "&value3=" + String(digitalRead(irPin)) + "";
     Serial.print("httpRequestData: ");
     Serial.println(httpRequestData);
-    
-    // You can comment the httpRequestData variable above
-    // then, use the httpRequestData variable below (for testing purposes without the BME280 sensor)
-    //String httpRequestData = "api_key=tPmAT5Ab3j7F9&sensor=BME280&location=Office&value1=24.75&value2=49.54&value3=1005.14";
 
     // Send HTTP POST request
     int httpResponseCode = https.POST(httpRequestData);
-     
-    // If you need an HTTP request with a content type: text/plain
-    //https.addHeader("Content-Type", "text/plain");
-    //int httpResponseCode = https.POST("Hello, World!");
-    
-    // If you need an HTTP request with a content type: application/json, use the following:
-    //https.addHeader("Content-Type", "application/json");
-    //int httpResponseCode = https.POST("{\"value1\":\"19\",\"value2\":\"67\",\"value3\":\"78\"}");
     
     if (httpResponseCode>0) {
       Serial.print("HTTP Response code: ");

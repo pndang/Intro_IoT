@@ -6,15 +6,15 @@
 #include "DHT.h"
 
 // Network credentials
-const char* ssid = "Phu Dang";
-const char* password = "dangphu9220";
+const char* ssid = "";
+const char* password = "";
 
 // Database info
 const char* serverName = "https://UCSD-HDSI-IOT.com/post-esp-data.php";
 
 #define LED_PIN     12
 #define NUM_LEDS     31   // 144 - MAX
-#define LOW_BRIGHTNESS    5
+#define LOW_BRIGHTNESS    5s
 #define MID_BRIGHTNESS    55
 #define HIG_BRIGHTNESS    115
 #define DHT_PIN     17
@@ -182,7 +182,7 @@ void graduallyOn(int currBrightness, int brightness) {
 
 void sendData() {
 
-  String apiKeyValue = "tPmAT5Ab3j7F9";
+  String apiKeyValue = "";
   String sensorName = "Team 3";
   String sensorLocation = "UC San Diego";
 
@@ -192,13 +192,13 @@ void sendData() {
     client->setInsecure(); //don't use SSL certificate
     HTTPClient https;
     
-    // Your Domain name with URL path or IP address with path
+    // Your Domain name with URL path
     https.begin(*client, serverName);
     
     // Specify content-type header
     https.addHeader("Content-Type", "application/x-www-form-urlencoded");
     
-    // Prepare your HTTP POST request data
+    // Prepare HTTP POST request data
     String httpRequestData = "api_key=" + apiKeyValue + "&sensor=" + sensorName
                           + "&location=" + sensorLocation + "&value1=" + String(digitalRead(pirPin))
                           + "&value2=" + String(dht.readHumidity())+"%" + "&value3=" + String(dht.readTemperature(true))+"°F" + "";

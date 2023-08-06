@@ -6,8 +6,8 @@
 #include "WiFi.h"
 
 // Replace with your network credentials
-const char* ssid = "Phu Dang";
-const char* password = "dangphu9220";
+const char* ssid = "";
+const char* password = "";
 
 void setup() {
   Serial.begin(115200);
@@ -18,7 +18,7 @@ void setup() {
   delay(100);
 
   Serial.println("Setup done");
-}
+}s
 
 void loop() {
   Serial.println("scan start");
